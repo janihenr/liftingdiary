@@ -6,6 +6,28 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a **Lifting Diary** application built with Next.js 16.1.1 using the App Router architecture, TypeScript, and Tailwind CSS v4.
 
+## CRITICAL: Documentation-First Development
+
+**ALWAYS refer to the `/docs` directory BEFORE generating any code.**
+
+- The `/docs` directory contains authoritative documentation for this project
+- Before implementing ANY feature, component, or functionality, CHECK if there is relevant documentation in `/docs`
+- Follow patterns, conventions, and specifications defined in the documentation files
+- If documentation exists for what you're building, use it as the primary reference
+- Documentation files take precedence over assumptions or general best practices
+
+This ensures consistency, follows project-specific patterns, and prevents reimplementation of documented solutions.
+
+### Extracting Reusable Utilities
+
+When documentation provides example code (e.g., helper functions, utilities):
+- **DO NOT** copy-paste the code directly into components
+- **DO** extract reusable functions to shared utility files in `lib/`
+- **DO** import and use these utilities across multiple components
+- **Avoid code duplication** - if a pattern appears in documentation, it should be in one place
+
+Example: The date formatting functions from `docs/ui.md` should be in `lib/date-utils.ts`, not duplicated in each component.
+
 ## Development Commands
 
 ```bash
@@ -53,6 +75,12 @@ npm run lint
   - `layout.tsx` - Root layout with ClerkProvider and auth components
   - `page.tsx` - Home page component
   - `globals.css` - Global styles and Tailwind imports
+- `lib/` - Shared utility functions and helpers
+  - `utils.ts` - Tailwind CSS class merging utilities (cn function)
+  - `date-utils.ts` - Date formatting utilities (formatDateWithOrdinal, etc.)
+- `components/` - React components
+  - `ui/` - shadcn/ui components (auto-generated)
+- `docs/` - Project documentation (authoritative reference)
 - `proxy.ts` - Clerk middleware using `clerkMiddleware()`
 - `public/` - Static assets (SVG files)
 - `.env.local` - Environment variables (not committed)
@@ -93,3 +121,15 @@ The build command performs:
 - Root layout applies Geist fonts via CSS variables (`--font-geist-sans`, `--font-geist-mono`)
 - Tailwind theme extended with custom CSS properties in `globals.css`
 - Dark mode styling uses `dark:` prefix with automatic `prefers-color-scheme` detection
+
+## UI Component Standards
+
+**CRITICAL: See `docs/ui.md` for complete UI standards.**
+
+Key rules:
+- **ONLY shadcn/ui components** - NO custom UI components
+- Install components with `npx shadcn@latest add <component-name>`
+- **date-fns** for all date formatting (standard format: "1st Sep 2025")
+- Use shared utilities from `lib/` (e.g., `formatDateWithOrdinal` from `lib/date-utils.ts`)
+
+Before creating any UI, check `docs/ui.md` for component and formatting requirements.
