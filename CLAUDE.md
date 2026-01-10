@@ -18,6 +18,26 @@ This is a **Lifting Diary** application built with Next.js 16.1.1 using the App 
 
 This ensures consistency, follows project-specific patterns, and prevents reimplementation of documented solutions.
 
+### MANDATORY Documentation References
+
+**These documentation files MUST be consulted before writing ANY code:**
+
+1. **`docs/ui.md`** - UI components and styling standards
+   - ONLY shadcn/ui components allowed
+   - Date formatting with date-fns
+   - Shared utility extraction patterns
+
+2. **`docs/data-fetching.md`** - Data fetching and security patterns
+   - Server Components ONLY for data fetching
+   - Helper functions in `/data` directory
+   - User data isolation with userId filtering
+   - Drizzle ORM usage (NO raw SQL)
+
+**DO NOT write any UI code without reading `docs/ui.md`.**
+**DO NOT write any data fetching code without reading `docs/data-fetching.md`.**
+
+These documents define critical security and architectural patterns that MUST be followed.
+
 ### Extracting Reusable Utilities
 
 When documentation provides example code (e.g., helper functions, utilities):
@@ -63,6 +83,14 @@ npm run lint
   - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` - Get from Clerk Dashboard
   - `CLERK_SECRET_KEY` - Get from Clerk Dashboard
 
+### Database
+- **Neon PostgreSQL** - Serverless Postgres database
+- **Drizzle ORM** - Type-safe database queries
+- Connection via `@neondatabase/serverless`
+- Schema defined in `db/schema.ts`
+- All queries via helper functions in `data/` directory
+- **CRITICAL**: All queries MUST filter by `userId` for data isolation
+
 ### Styling
 - **Tailwind CSS v4** using `@tailwindcss/postcss`
 - Custom CSS variables defined in `app/globals.css`
@@ -75,12 +103,21 @@ npm run lint
   - `layout.tsx` - Root layout with ClerkProvider and auth components
   - `page.tsx` - Home page component
   - `globals.css` - Global styles and Tailwind imports
+- `data/` - **Database query helper functions (Drizzle ORM)**
+  - `workouts.ts` - Workout-related queries (filtered by userId)
+  - `exercises.ts` - Exercise-related queries (filtered by userId)
+  - All queries MUST filter by userId for security
+- `db/` - Database configuration and schema
+  - `index.ts` - Database connection
+  - `schema.ts` - Drizzle ORM schema definitions
 - `lib/` - Shared utility functions and helpers
   - `utils.ts` - Tailwind CSS class merging utilities (cn function)
   - `date-utils.ts` - Date formatting utilities (formatDateWithOrdinal, etc.)
 - `components/` - React components
   - `ui/` - shadcn/ui components (auto-generated)
 - `docs/` - Project documentation (authoritative reference)
+  - `ui.md` - UI component and styling standards
+  - `data-fetching.md` - Data fetching and security patterns
 - `proxy.ts` - Clerk middleware using `clerkMiddleware()`
 - `public/` - Static assets (SVG files)
 - `.env.local` - Environment variables (not committed)
@@ -133,3 +170,17 @@ Key rules:
 - Use shared utilities from `lib/` (e.g., `formatDateWithOrdinal` from `lib/date-utils.ts`)
 
 Before creating any UI, check `docs/ui.md` for component and formatting requirements.
+
+## Data Fetching Standards
+
+**CRITICAL: See `docs/data-fetching.md` for complete data fetching standards.**
+
+Key rules:
+- **ONLY Server Components** - ALL data fetching via Server Components
+- **NO API routes** - NEVER create route handlers for data fetching
+- **NO client-side fetching** - NEVER fetch data in Client Components
+- **Helper functions in `/data`** - ALL database queries via helper functions
+- **Drizzle ORM ONLY** - NEVER use raw SQL
+- **User isolation** - ALWAYS filter by `userId` to prevent data leaks
+
+Before implementing any data fetching, check `docs/data-fetching.md` for security and pattern requirements.
